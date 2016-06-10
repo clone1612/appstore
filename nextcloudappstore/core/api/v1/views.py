@@ -1,9 +1,20 @@
-from nextcloudappstore.core.api.v1.serializers import AppSerializer
+from django.db import transaction
+from django.conf import settings
+from django.http import Http404
+from nextcloudappstore.core.api.v1.release.downloader import \
+    AppReleaseDownloader
+from nextcloudappstore.core.api.v1.release.parser import \
+    GunZipAppMetadataExtractor, parse_app_metadata
+from nextcloudappstore.core.api.v1.release.provider import AppReleaseProvider
+from nextcloudappstore.core.api.v1.serializers import AppSerializer, \
+    AppReleaseDownloadSerializer
+from nextcloudappstore.core.facades import resolve_file_relative_path
 from nextcloudappstore.core.models import App, AppRelease
 from nextcloudappstore.core.permissions import UpdateDeletePermission
 from nextcloudappstore.core.versioning import app_has_included_release
 from rest_framework import authentication
 from rest_framework.generics import DestroyAPIView, get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 
@@ -31,7 +42,50 @@ class Apps(DestroyAPIView):
 
 class AppReleases(DestroyAPIView):
     authentication_classes = (authentication.BasicAuthentication,)
-    permission_classes = (UpdateDeletePermission,)
+    permission_classes = (UpdateDeletePermission, IsAuthenticated)
+
+    def put(self, request, app, version):
+        # run inside a transaction to properly clean up relations on errors
+        with(transaction.atomic()):
+            # first make sure to operate on the correct instances and run
+            # permission checks
+            serializer = AppReleaseDownloadSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            status, app_model, release_model = self._fetch_models(request,
+                                                                  app,
+                                                                  version)
+
+            # if everything is fine, download the latest release and create
+            # or update the models
+            url = serializer.validated_data['download']
+            provider = AppReleaseProvider()
+            info = provider.get_release_info(app, version, url,
+                                             settings.RELEASE_DOWNLOAD_ROOT)
+
+        return Response(status=status)
+
+    def _fetch_models(self, request, app, version):
+        # if an app does not exist, the request should create it with its
+        # owner set to the currently logged in user
+        try:
+            app = App.objects.get(pk=app)
+        except App.DoesNotExist:
+            app = App.objects.create(pk=app, owner=request.user)
+
+        # if an app release does not exist, it must be checked if the
+        # user is allowed to create it first
+        try:
+            release = self.get_object()
+            status = 200
+        except Http404:
+            release = AppRelease()
+            release.version = version
+            release.app = app
+            self.check_object_permissions(request, release)
+            release.save()
+            status = 201
+
+        return (status, app, release)
 
     def get_object(self):
         release = AppRelease.objects.filter(version=self.kwargs['version'],
