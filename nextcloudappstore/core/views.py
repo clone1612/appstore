@@ -5,6 +5,7 @@ from nextcloudappstore.core.mixins \
     import CategoryContextMixin, RecommendedAppsContextMixin
 from nextcloudappstore.core.models import App, Category
 
+
 class HomeView(CategoryContextMixin,
                RecommendedAppsContextMixin, TemplateView):
     template_name = "home.html"
