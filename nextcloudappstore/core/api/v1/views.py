@@ -1,14 +1,9 @@
-from django.db import transaction
 from django.conf import settings
+from django.db import transaction
 from django.http import Http404
-from nextcloudappstore.core.api.v1.release.downloader import \
-    AppReleaseDownloader
-from nextcloudappstore.core.api.v1.release.parser import \
-    GunZipAppMetadataExtractor, parse_app_metadata
 from nextcloudappstore.core.api.v1.release.provider import AppReleaseProvider
 from nextcloudappstore.core.api.v1.serializers import AppSerializer, \
     AppReleaseDownloadSerializer
-from nextcloudappstore.core.facades import resolve_file_relative_path
 from nextcloudappstore.core.models import App, AppRelease
 from nextcloudappstore.core.permissions import UpdateDeletePermission
 from nextcloudappstore.core.versioning import app_has_included_release
@@ -45,12 +40,11 @@ class AppReleases(DestroyAPIView):
     permission_classes = (UpdateDeletePermission, IsAuthenticated)
 
     def put(self, request, app, version):
-        # run inside a transaction to properly clean up relations on errors
+        serializer = AppReleaseDownloadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         with(transaction.atomic()):
             # first make sure to operate on the correct instances and run
             # permission checks
-            serializer = AppReleaseDownloadSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
             status, app_model, release_model = self._fetch_models(request,
                                                                   app,
                                                                   version)
