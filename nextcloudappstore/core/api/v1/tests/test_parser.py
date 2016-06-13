@@ -9,7 +9,7 @@ from nextcloudappstore.core.facades import resolve_file_relative_path, \
 
 class ParserTest(TestCase):
     def setUp(self):
-        schema_file = self.get_path('../release/platform/10.0/info.xsd')
+        schema_file = self.get_path('../release/info.xsd')
         self.schema = read_file_contents(schema_file)
 
     def test_parse_minimal(self):

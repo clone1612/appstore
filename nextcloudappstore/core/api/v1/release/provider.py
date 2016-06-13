@@ -9,8 +9,7 @@ class AppReleaseProvider:
     def __init__(self):
         self.downloader = AppReleaseDownloader()
         self.extractor = GunZipAppMetadataExtractor()
-        schema = 'release/platform/10.0/info.xsd'
-        self.schema_file = resolve_file_relative_path(__file__, schema)
+        self.schema_file = resolve_file_relative_path(__file__, 'info.xsd')
 
     def get_release_info(self, app, version, url, tmp_dir):
         with self.downloader.download_release(url, tmp_dir) as download:
