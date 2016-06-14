@@ -3,75 +3,103 @@
     <xsl:template match="/info">
         <app>
             <!-- must have attributes -->
-            <id><xsl:value-of select="id"/></id>
+            <id>
+                <xsl:value-of select="id"/>
+            </id>
             <categories type="list">
                 <xsl:for-each select="category">
                     <category>
-                        <id><xsl:value-of select="."/></id>
+                        <id>
+                            <xsl:value-of select="."/>
+                        </id>
                     </category>
                 </xsl:for-each>
             </categories>
 
-            <xsl:for-each select="description">
-                <description type="l10n">
-                    <value><xsl:value-of select="."/></value>
+            <description>
+                <xsl:for-each select="description">
                     <xsl:choose>
                         <xsl:when test="@lang">
-                            <lang><xsl:value-of select="."/></lang>
+                            <xsl:element name="{@lang}">
+                                <xsl:value-of select="."/>
+                            </xsl:element>
                         </xsl:when>
                         <xsl:otherwise>
-                            <lang>en</lang>
+                            <en><xsl:value-of select="."/></en>
                         </xsl:otherwise>
                     </xsl:choose>
-                </description>
-            </xsl:for-each>
+                </xsl:for-each>
+            </description>
 
-            <xsl:for-each select="name">
-                <name type="l10n">
-                    <value><xsl:value-of select="."/></value>
+            <name>
+                <xsl:for-each select="name">
                     <xsl:choose>
                         <xsl:when test="@lang">
-                            <lang><xsl:value-of select="."/></lang>
+                            <xsl:element name="{@lang}">
+                                <xsl:value-of select="."/>
+                            </xsl:element>
                         </xsl:when>
                         <xsl:otherwise>
-                            <lang>en</lang>
+                            <en><xsl:value-of select="."/></en>
                         </xsl:otherwise>
                     </xsl:choose>
-                </name>
-            </xsl:for-each>
+                </xsl:for-each>
+            </name>
 
             <screenshots type="list">
                 <xsl:for-each select="screenshot">
                     <screenshot>
-                        <url><xsl:value-of select="."/></url>
+                        <url>
+                            <xsl:value-of select="."/>
+                        </url>
                     </screenshot>
                 </xsl:for-each>
             </screenshots>
 
             <!-- optional elements need defaults -->
-            <user-docs><xsl:value-of select="documentation/user"/></user-docs>
-            <admin-docs><xsl:value-of select="documentation/admin"/></admin-docs>
-            <developer-docs><xsl:value-of select="documentation/developer"/></developer-docs>
+            <user-docs>
+                <xsl:value-of select="documentation/user"/>
+            </user-docs>
+            <admin-docs>
+                <xsl:value-of select="documentation/admin"/>
+            </admin-docs>
+            <developer-docs>
+                <xsl:value-of select="documentation/developer"/>
+            </developer-docs>
 
-            <website><xsl:value-of select="website"/></website>
-            <issue-tracker><xsl:value-of select="bugs"/></issue-tracker>
+            <website>
+                <xsl:value-of select="website"/>
+            </website>
+            <issue-tracker>
+                <xsl:value-of select="bugs"/>
+            </issue-tracker>
 
             <!-- release -->
             <release>
-                <version><xsl:value-of select="version"/></version>
+                <version>
+                    <xsl:value-of select="version"/>
+                </version>
                 <authors type="list">
                     <xsl:for-each select="author">
                         <author>
-                            <name><xsl:value-of select="."/></name>
-                            <mail><xsl:value-of select="@mail"/></mail>
-                            <homepage><xsl:value-of select="@homepage"/></homepage>
+                            <name>
+                                <xsl:value-of select="."/>
+                            </name>
+                            <mail>
+                                <xsl:value-of select="@mail"/>
+                            </mail>
+                            <homepage>
+                                <xsl:value-of select="@homepage"/>
+                            </homepage>
                         </author>
                     </xsl:for-each>
                 </authors>
                 <licenses type="list">
                     <xsl:for-each select="licence">
                         <license>
-                            <id><xsl:value-of select="."/></id>
+                            <id>
+                                <xsl:value-of select="."/>
+                            </id>
                         </license>
                     </xsl:for-each>
                 </licenses>
@@ -82,20 +110,36 @@
     </xsl:template>
 
     <xsl:template match="dependencies">
-        <php-min-version><xsl:value-of select="php/@min-version"/></php-min-version>
-        <php-max-version><xsl:value-of select="php/@max-version"/></php-max-version>
-        <min-int-size><xsl:value-of select="php/@min-int-size"/></min-int-size>
-        <platform-min-version><xsl:value-of select="owncloud/@min-version"/></platform-min-version>
-        <platform-max-version><xsl:value-of select="owncloud/@max-version"/></platform-max-version>
+        <php-min-version>
+            <xsl:value-of select="php/@min-version"/>
+        </php-min-version>
+        <php-max-version>
+            <xsl:value-of select="php/@max-version"/>
+        </php-max-version>
+        <min-int-size>
+            <xsl:value-of select="php/@min-int-size"/>
+        </min-int-size>
+        <platform-min-version>
+            <xsl:value-of select="owncloud/@min-version"/>
+        </platform-min-version>
+        <platform-max-version>
+            <xsl:value-of select="owncloud/@max-version"/>
+        </platform-max-version>
 
         <php-extensions type="list">
             <php-extension-dependencies type="list">
                 <xsl:for-each select="lib">
                     <php-extension-dependency>
-                        <min-version><xsl:value-of select="@min-version"/></min-version>
-                        <max-version><xsl:value-of select="@max-version"/></max-version>
+                        <min-version>
+                            <xsl:value-of select="@min-version"/>
+                        </min-version>
+                        <max-version>
+                            <xsl:value-of select="@max-version"/>
+                        </max-version>
                         <php-extension>
-                            <id><xsl:value-of select="."/></id>
+                            <id>
+                                <xsl:value-of select="."/>
+                            </id>
                         </php-extension>
                     </php-extension-dependency>
                 </xsl:for-each>
@@ -105,10 +149,16 @@
             <database-dependencies type="list">
                 <xsl:for-each select="database">
                     <database-dependency>
-                        <min-version><xsl:value-of select="@min-version"/></min-version>
-                        <max-version><xsl:value-of select="@max-version"/></max-version>
+                        <min-version>
+                            <xsl:value-of select="@min-version"/>
+                        </min-version>
+                        <max-version>
+                            <xsl:value-of select="@max-version"/>
+                        </max-version>
                         <database>
-                            <id><xsl:value-of select="."/></id>
+                            <id>
+                                <xsl:value-of select="."/>
+                            </id>
                         </database>
                     </database-dependency>
                 </xsl:for-each>
@@ -116,7 +166,11 @@
         </databases>
         <shell-commands type="list">
             <xsl:for-each select="command">
-                <shell-command><xsl:value-of select="."/></shell-command>
+                <shell-command>
+                    <id>
+                        <xsl:value-of select="."/>
+                    </id>
+                </shell-command>
             </xsl:for-each>
         </shell-commands>
     </xsl:template>

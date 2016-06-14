@@ -52,12 +52,6 @@ def element_to_dict(element):
     type = element.get('type')
     if type == 'list':
         contents = list(map(element_to_dict, element.iterchildren()))
-    elif type == 'l10n':
-        lang = element.find('lang').text
-        value = element.find('value').text
-        contents = {
-            lang: value
-        }
     elif len(list(element)) > 0:
         contents = {}
         for child in element.iterchildren():

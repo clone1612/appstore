@@ -88,61 +88,110 @@ class ParserTest(TestCase):
     def test_map_data(self):
         full = self._get_test_xml('data/infoxmls/full.xml')
         result = parse_app_metadata(full, self.schema, self.xslt)
-        data = ''  # dict_to_data(result)
-        release = {
-            'version': '8.8.2',
-            'licenses': [{'id': 'agpl'}, {'id': 'mit'}],
-            'authors': [
-                {
-                    'name': 'Bernhard Posselt',
-                    'homepage': 'http://example.com',
-                    'mail': 'mail@provider.com'
-                },
-                {'name': 'Alessandro Cosentino'},
-                {'name': 'Jan-Christoph Borchardt'}
-            ],
-            'screenshots': [
-                {'url': 'https://example.com/1.png', 'order': 0},
-                {'url': 'https://example.com/2.png', 'order': 1},
-            ],
-            'libs': [{'id': 'curl'}, {'id': 'iconv'}, {'id': 'SimpleXML'},
-                     {'id': 'libxml', 'min_version': '2.7.8'}],
-            'databases': [{'id': 'sqlite'},
-                          {'id': 'pgsql', 'min_version': '9.4'},
-                          {'id': 'mysql', 'min_version': '5.5'}],
-            'shell_commands': ['grep', 'ls'],
-            'php_min_version': '5.6',
-            'platform_min_version': '9.0',
-            'platform_max_version': '9.1',
-            'min_int_size': '64',
-        }
-        expected = {
+        expected = {'app': {
             'id': 'news',
-            'translations': {
-                'de': {
-                    'name': 'Nachrichten',
-                    'description': 'Eine Nachrichten App, welche mit ['
-                                   'RSS/Atom]('
-                                   'https://en.wikipedia.org/wiki/RSS) '
-                                   'umgehen kann'
-                },
-                'en': {
-                    'name': 'News',
-                    'description': 'An RSS/Atom feed reader'
-                }
-            },
-            'user_docs': 'https://github.com/owncloud/news/wiki#user'
-                         '-documentation',
             'admin_docs': 'https://github.com/owncloud/news#readme',
+            'categories': [
+                {'category': {'id': 'multimedia'}},
+                {'category': {'id': 'tools'}}
+            ],
+            'description': {
+                'en': 'An RSS/Atom feed reader',
+                'de': 'Eine Nachrichten App, welche mit [RSS/Atom]('
+                      'https://en.wikipedia.org/wiki/RSS) umgehen kann'
+            },
             'developer_docs':
                 'https://github.com/owncloud/news/wiki#developer'
                 '-documentation',
-            'issue_tracker': 'https://github.com/owncloud/news/issues',
+            'user_docs': 'https://github.com/owncloud/news/wiki#user'
+                         '-documentation',
             'website': 'https://github.com/owncloud/news',
-            'categories': [{'id': 'multimedia'}, {'id': 'tools'}],
-            'release': release
-        }
-        self.assertDictEqual(expected, data)
+            'issue_tracker': 'https://github.com/owncloud/news/issues',
+            'name': {'de': 'Nachrichten', 'en': 'News'},
+            'release': {
+                'authors': [
+                    {'author': {
+                        'homepage': 'http://example.com',
+                        'mail': 'mail@provider.com',
+                        'name': 'Bernhard Posselt'
+                    }},
+                    {'author': {
+                        'homepage': None,
+                        'mail': None,
+                        'name': 'Alessandro Cosentino'
+                    }},
+                    {'author': {
+                        'homepage': None,
+                        'mail': None,
+                        'name': 'Jan-Christoph Borchardt'
+                    }}
+                ],
+                'databases': [
+                    {
+                        'database_dependencies': [{
+                            'database_dependency': {
+                                'database': {'id': 'pgsql'},
+                                'max_version': None,
+                                'min_version': '9.4'
+                            }}, {
+                            'database_dependency': {
+                                'database': {'id': 'sqlite'},
+                                'max_version': None,
+                                'min_version': None}}, {
+                            'database_dependency': {
+                                'database': {'id': 'mysql'},
+                                'max_version': None,
+                                'min_version': '5.5'
+                            }}
+                        ]
+                    }
+                ],
+                'licenses': [
+                    {'license': {'id': 'mit'}},
+                    {'license': {'id': 'agpl'}}
+                ],
+                'min_int_size': '64',
+                'php_extensions': [{
+                    'php_extension_dependencies': [
+                        {
+                            'php_extension_dependency': {
+                                'max_version': None,
+                                'min_version': '2.7.8',
+                                'php_extension': {'id': 'libxml'}}
+                        }, {
+                            'php_extension_dependency': {
+                                'max_version': None,
+                                'min_version': None,
+                                'php_extension': {'id': 'curl'}}
+                        }, {
+                            'php_extension_dependency': {
+                                'max_version': None,
+                                'min_version': None,
+                                'php_extension': {'id': 'SimpleXML'}}
+                        }, {
+                            'php_extension_dependency': {
+                                'max_version': None,
+                                'min_version': None,
+                                'php_extension': {'id': 'iconv'}}
+                        }
+                    ]
+                }],
+                'php_max_version': None,
+                'php_min_version': '5.6',
+                'platform_max_version': '9.1',
+                'platform_min_version': '9.0',
+                'shell_commands': [
+                    {'shell_command': {'id': 'grep'}},
+                    {'shell_command': {'id': 'ls'}}
+                ],
+                'version': '8.8.2'
+            },
+            'screenshots': [
+                {'screenshot': {'url': 'https://example.com/1.png'}},
+                {'screenshot': {'url': 'https://example.com/2.jpg'}}
+            ],
+        }}
+        self.assertDictEqual(expected, result)
 
     def _get_test_xml(self, target):
         path = self.get_path(target)
