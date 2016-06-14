@@ -174,6 +174,11 @@ MEDIA_ROOT = '/var/www/example.com/upload/'
 # Public and private keys for Googles recaptcha
 RECAPTCHA_PUBLIC_KEY = '<YOUR PUBLIC KEY>'
 RECAPTCHA_PRIVATE_KEY = '<YOUR PRIVATE KEY>'
+
+# https://docs.djangoproject.com/en/1.9/ref/settings/#std:setting-EMAIL_HOST
+EMAIL_HOST = 'localhost'
+# https://docs.djangoproject.com/en/1.9/ref/settings/#default-from-email
+DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 ```
 
 For more information about web server setup, take a look at [the deployment documentation](https://docs.djangoproject.com/en/1.9/howto/deployment/)
