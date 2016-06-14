@@ -18,23 +18,35 @@ class ParserTest(TestCase):
     def test_parse_minimal(self):
         xml = self._get_test_xml('data/infoxmls/minimal.xml')
         result = parse_app_metadata(xml, self.schema, self.xslt)
-        expected = {
-            'app': {
-                'id': 'news',
+        expected = {'app': {
+            'id': 'news',
+            'description': {'en': 'An RSS/Atom feed reader'},
+            'name': {'en': 'News'},
+            'admin_docs': None,
+            'developer_docs': None,
+            'user_docs': None,
+            'website': None,
+            'issue_tracker': None,
+            'screenshots': [],
+            'categories': [{'category': {'id': 'multimedia'}}],
+            'release': {
+                'authors': [{'author': {
+                    'homepage': None,
+                    'mail': None,
+                    'name': 'Bernhard Posselt'
+                }}],
+                'databases': [{'database_dependencies': []}],
+                'licenses': [{'license': {'id': 'agpl'}}],
+                'min_int_size': None,
+                'php_extensions': [{'php_extension_dependencies': []}],
+                'php_max_version': None,
+                'php_min_version': None,
+                'platform_max_version': None,
+                'platform_min_version': '9.0',
+                'shell_commands': [],
+                'version': '8.8.2'
             }
-        }
-        #     {'children': [], 'tag': 'id', 'text': 'news'},
-        #     {'children': [], 'tag': 'name', 'text': 'News'},
-        #     {'children': [], 'tag': 'description',
-        #      'text': 'An RSS/Atom feed reader'},
-        #     {'children': [], 'tag': 'version', 'text': '8.8.2'},
-        #     {'children': [], 'tag': 'licence', 'text': 'agpl'},
-        #     {'children': [], 'tag': 'author', 'text': 'Bernhard Posselt'},
-        #     {'children': [], 'tag': 'category', 'text': 'multimedia'},
-        #     {'tag': 'dependencies', 'children': [
-        #         {'@min-version': '9.0', 'children': [], 'tag': 'owncloud'}
-        #     ]}
-        # }
+        }}
         self.assertDictEqual(expected, result)
 
     def test_validate_schema(self):
@@ -76,7 +88,7 @@ class ParserTest(TestCase):
     def test_map_data(self):
         full = self._get_test_xml('data/infoxmls/full.xml')
         result = parse_app_metadata(full, self.schema, self.xslt)
-        data = '' #dict_to_data(result)
+        data = ''  # dict_to_data(result)
         release = {
             'version': '8.8.2',
             'licenses': [{'id': 'agpl'}, {'id': 'mit'}],
