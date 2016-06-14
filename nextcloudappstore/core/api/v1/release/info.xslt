@@ -11,9 +11,34 @@
                     </category>
                 </xsl:for-each>
             </categories>
-            <translations>
-                <!--<xsl:for-each select=""-->
-            </translations>
+
+            <xsl:for-each select="description">
+                <description type="l10n">
+                    <value><xsl:value-of select="."/></value>
+                    <xsl:choose>
+                        <xsl:when test="@lang">
+                            <lang><xsl:value-of select="."/></lang>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <lang>en</lang>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </description>
+            </xsl:for-each>
+
+            <xsl:for-each select="name">
+                <name type="l10n">
+                    <value><xsl:value-of select="."/></value>
+                    <xsl:choose>
+                        <xsl:when test="@lang">
+                            <lang><xsl:value-of select="."/></lang>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <lang>en</lang>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </name>
+            </xsl:for-each>
 
             <screenshots type="list">
                 <xsl:for-each select="screenshot">
