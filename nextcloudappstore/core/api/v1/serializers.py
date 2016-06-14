@@ -45,17 +45,19 @@ class CategorySerializer(TranslatableModelSerializer):
 class AppReleaseSerializer(serializers.ModelSerializer):
     databases = DatabaseDependencySerializer(many=True, read_only=True,
                                              source='databasedependencies')
-    libs = PhpExtensionDependencySerializer(many=True, read_only=True,
+    php_extensions = PhpExtensionDependencySerializer(many=True, read_only=True,
                                             source='phpextensiondependencies')
     licenses = LicenseSerializer(many=True, read_only=True)
+    authors = AuthorSerializer(many=True, read_only=True)
+
 
     class Meta:
         model = AppRelease
         fields = (
-            'version', 'libs', 'databases', 'shell_commands',
+            'version', 'php_extensions', 'databases', 'shell_commands',
             'php_min_version', 'php_max_version', 'platform_min_version',
             'platform_max_version', 'min_int_size', 'download', 'created',
-            'licenses', 'last_modified', 'checksum'
+            'licenses', 'last_modified', 'checksum', 'authors'
         )
 
 
@@ -68,7 +70,6 @@ class ScreenshotSerializer(serializers.ModelSerializer):
 class AppSerializer(serializers.ModelSerializer):
     categories = CategorySerializer(many=True, read_only=True)
     releases = AppReleaseSerializer(many=True, read_only=True)
-    authors = AuthorSerializer(many=True, read_only=True)
     screenshots = ScreenshotSerializer(many=True, read_only=True)
     translations = TranslatedFieldsField(shared_model=App)
     recommendations = serializers.SerializerMethodField()
@@ -78,7 +79,7 @@ class AppSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'categories', 'user_docs', 'admin_docs', 'developer_docs',
             'issue_tracker', 'website', 'created', 'last_modified', 'releases',
-            'authors', 'screenshots', 'translations', 'recommendations'
+            'screenshots', 'translations', 'recommendations'
         )
 
     def get_recommendations(self, obj):

@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import transaction
 from django.http import Http404
+from nextcloudappstore.core.api.v1.release.importer import AppReleaseImporter
 from nextcloudappstore.core.api.v1.release.provider import AppReleaseProvider
 from nextcloudappstore.core.api.v1.serializers import AppSerializer, \
     AppReleaseDownloadSerializer
@@ -45,9 +46,7 @@ class AppReleases(DestroyAPIView):
         with(transaction.atomic()):
             # first make sure to operate on the correct instances and run
             # permission checks
-            status, app_model, release_model = self._fetch_models(request,
-                                                                  app,
-                                                                  version)
+            status = self._init_release(request, app, version)
 
             # if everything is fine, download the latest release and create
             # or update the models
@@ -55,10 +54,11 @@ class AppReleases(DestroyAPIView):
             provider = AppReleaseProvider()
             info = provider.get_release_info(app, version, url,
                                              settings.RELEASE_DOWNLOAD_ROOT)
-
+            importer = AppReleaseImporter()
+            importer.import_release(info)
         return Response(status=status)
 
-    def _fetch_models(self, request, app, version):
+    def _init_release(self, request, app, version):
         # if an app does not exist, the request should create it with its
         # owner set to the currently logged in user
         try:
@@ -69,7 +69,7 @@ class AppReleases(DestroyAPIView):
         # if an app release does not exist, it must be checked if the
         # user is allowed to create it first
         try:
-            release = self.get_object()
+            self.get_object()
             status = 200
         except Http404:
             release = AppRelease()
@@ -79,7 +79,7 @@ class AppReleases(DestroyAPIView):
             release.save()
             status = 201
 
-        return (status, app, release)
+        return status
 
     def get_object(self):
         release = AppRelease.objects.filter(version=self.kwargs['version'],

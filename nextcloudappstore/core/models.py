@@ -8,7 +8,6 @@ class App(TranslatableModel):
                           verbose_name=_('Id'),
                           help_text=_('app id, same as the folder name'))
     categories = models.ManyToManyField('Category', verbose_name=_('Category'))
-    authors = models.ManyToManyField('Author', verbose_name=_('Authors'))
     translations = TranslatedFields(
         name=models.CharField(max_length=128, verbose_name=_('Name'),
                               help_text=_('Rendered app name for users')),
@@ -64,8 +63,9 @@ class AppRelease(models.Model):
                                    'Version follows Semantic Versioning'))
     app = models.ForeignKey('App', on_delete=models.CASCADE,
                             verbose_name=_('App'), related_name='releases')
+    authors = models.ManyToManyField('Author', verbose_name=_('Authors'))
     # dependencies
-    libs = models.ManyToManyField('PhpExtension',
+    php_extensions = models.ManyToManyField('PhpExtension',
                                   through='PhpExtensionDependency',
                                   verbose_name=_('PHP extension dependency'),
                                   blank=True)

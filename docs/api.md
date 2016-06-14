@@ -47,7 +47,7 @@ This is the route that will return all releases to display inside Nextcloud's ap
                 {
                     "version": "1.9.0",
                     "checksum": "65e613318107bceb131af5cf8b71e773b79e1a9476506f502c8e2017b52aba15",
-                    "libs": [
+                    "phpExtensions": [
                         {
                             "id": "libxml",
                             "minVersion": "3",

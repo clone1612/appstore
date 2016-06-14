@@ -59,6 +59,7 @@ def etree_to_dict(element):
     return result
 
 
+
 def parse_app_metadata(xml, schema):
     """
     Parses, validates and maps the xml onto a dict

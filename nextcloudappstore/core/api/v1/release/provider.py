@@ -15,4 +15,5 @@ class AppReleaseProvider:
         with self.downloader.download_release(url, tmp_dir) as download:
             xml = self.extractor.extract_app_metadata(download.filename, app)
             info = parse_app_metadata(xml, self.schema_file)
+        # TODO: validate version
         return info
