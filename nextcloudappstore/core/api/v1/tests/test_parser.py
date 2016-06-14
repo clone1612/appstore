@@ -2,8 +2,7 @@ from django.test import TestCase
 from nextcloudappstore.core.api.v1.release.parser import \
     parse_app_metadata, GunZipAppMetadataExtractor, \
     InvalidAppPackageStructureException, \
-    UnsupportedAppArchiveException, InvalidAppMetadataXmlException, \
-    dict_to_data
+    UnsupportedAppArchiveException, InvalidAppMetadataXmlException
 from nextcloudappstore.core.facades import resolve_file_relative_path, \
     read_file_contents
 
@@ -12,30 +11,36 @@ class ParserTest(TestCase):
     def setUp(self):
         schema_file = self.get_path('../release/info.xsd')
         self.schema = read_file_contents(schema_file)
+        xslt_file = self.get_path('../release/info.xslt')
+        self.xslt = read_file_contents(xslt_file)
+        self.maxDiff = None
 
     def test_parse_minimal(self):
         xml = self._get_test_xml('data/infoxmls/minimal.xml')
-        result = parse_app_metadata(xml, self.schema)
-        expected = [
-            {'children': [], 'tag': 'id', 'text': 'news'},
-            {'children': [], 'tag': 'name', 'text': 'News'},
-            {'children': [], 'tag': 'description',
-             'text': 'An RSS/Atom feed reader'},
-            {'children': [], 'tag': 'version', 'text': '8.8.2'},
-            {'children': [], 'tag': 'licence', 'text': 'agpl'},
-            {'children': [], 'tag': 'author', 'text': 'Bernhard Posselt'},
-            {'children': [], 'tag': 'category', 'text': 'multimedia'},
-            {'tag': 'dependencies', 'text': None, 'children': [
-                {'@min-version': '9.0', 'children': [], 'tag': 'owncloud',
-                 'text': None}
-            ]}
-        ]
-        self.assertListEqual(expected, result)
+        result = parse_app_metadata(xml, self.schema, self.xslt)
+        expected = {
+            'app': {
+                'id': 'news',
+            }
+        }
+        #     {'children': [], 'tag': 'id', 'text': 'news'},
+        #     {'children': [], 'tag': 'name', 'text': 'News'},
+        #     {'children': [], 'tag': 'description',
+        #      'text': 'An RSS/Atom feed reader'},
+        #     {'children': [], 'tag': 'version', 'text': '8.8.2'},
+        #     {'children': [], 'tag': 'licence', 'text': 'agpl'},
+        #     {'children': [], 'tag': 'author', 'text': 'Bernhard Posselt'},
+        #     {'children': [], 'tag': 'category', 'text': 'multimedia'},
+        #     {'tag': 'dependencies', 'children': [
+        #         {'@min-version': '9.0', 'children': [], 'tag': 'owncloud'}
+        #     ]}
+        # }
+        self.assertDictEqual(expected, result)
 
     def test_validate_schema(self):
         xml = self._get_test_xml('data/infoxmls/invalid.xml')
         with (self.assertRaises(InvalidAppMetadataXmlException)):
-            parse_app_metadata(xml, self.schema)
+            parse_app_metadata(xml, self.schema, self.xslt)
 
     def test_extract_gunzip_info(self):
         path = self.get_path('data/archives/full.tar.gz')
@@ -70,8 +75,8 @@ class ParserTest(TestCase):
 
     def test_map_data(self):
         full = self._get_test_xml('data/infoxmls/full.xml')
-        result = parse_app_metadata(full, self.schema)
-        data = dict_to_data(result)
+        result = parse_app_metadata(full, self.schema, self.xslt)
+        data = '' #dict_to_data(result)
         release = {
             'version': '8.8.2',
             'licenses': [{'id': 'agpl'}, {'id': 'mit'}],

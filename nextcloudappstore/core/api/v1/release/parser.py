@@ -48,23 +48,33 @@ class GunZipAppMetadataExtractor:
             msg = 'Could not find %s file inside the archive' % info_path
             raise InvalidAppPackageStructureException(msg)
 
-
-def etree_to_dict(element):
-    result = {
-        'tag': element.tag,
-        'text': element.text,
-        'children': list(map(etree_to_dict, element.iterchildren()))
+def element_to_dict(element):
+    type = element.get('type')
+    if type == 'list':
+        contents = list(map(element_to_dict, element.iterchildren()))
+    elif type == 'l10n':
+        lang = element.find('lang').text
+        value = element.find('value').text
+        contents = {
+            lang: value
+        }
+    elif len(list(element)) > 0:
+        contents = {}
+        for child in element.iterchildren():
+            contents.update(element_to_dict(child))
+    else:
+        contents = element.text
+    return {
+        element.tag.replace('-', '_'): contents
     }
-    result.update(('@' + key, val) for key, val in element.attrib.items())
-    return result
 
 
-
-def parse_app_metadata(xml, schema):
+def parse_app_metadata(xml, schema, xslt):
     """
     Parses, validates and maps the xml onto a dict
     :argument xml the info.xml string to parse
     :argument schema the schema xml as string
+    :argument xslt the xslt to transform it to a matching structure
     :raises InvalidAppMetadataXmlException if the schema does not validate
     :return the parsed xml as dict
     """
@@ -77,5 +87,7 @@ def parse_app_metadata(xml, schema):
         schema.assertValid(doc)
     except DocumentInvalid as e:
         raise InvalidAppMetadataXmlException(e)
-    mapped = etree_to_dict(doc)
-    return mapped['children']
+    transform = etree.XSLT(etree.XML(xslt))
+    transformed_doc = transform(doc)
+    mapped = element_to_dict(transformed_doc.getroot())
+    return mapped
